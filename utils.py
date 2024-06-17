@@ -112,14 +112,14 @@ def rec_2(seq, poss_sizes, Pyc, cur_sizes, i, max_length):
     cur_v = seq[i]
     for size in poss_sizes[cur_v]:
         cur_sizes[i] = size
-        
+
         if i == len(seq) - 1:
             tuple_sizes = tuple(cur_sizes + (max_length - len(seq)) * [0])
             if tuple_sizes not in Pyc:
                 Pyc[tuple_sizes] = []
                 
             cndl_counts = defaultdict(int)
-            
+
             for x, v in enumerate(seq):
                 cndl_counts[(v, cur_sizes[x])] += 1
                 

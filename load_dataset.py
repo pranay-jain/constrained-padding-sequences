@@ -26,38 +26,6 @@ def load_dataset(dataset, cap_sequences, cap_length):
             sequences.append(seq)
             
         Q = {(row['from'], row['to']): row['percentage'] for _, row in df_q.iterrows()}
-    
-    # load Linode
-    if dataset == 'linode':
-        vFile = 'data/linode/vertices_no_errors.csv'
-        oFile = 'data/linode/object_lists_short.txt'
-        eFile = 'data/linode/edges_no_errors.csv'
-        seqFile = 'data/linode/linode_sequences.csv'
-
-        vertexList = (pd.read_csv(vFile))['URL'].tolist()
-        with open(oFile) as f:
-            objectLists = json.load(f)
-    
-        vertices = {}
-
-        for url in vertexList:
-            objList = objectLists[url]
-            total = 0
-            for obj in objList:
-                total += int(obj[2])
-        
-            vertices[url] = total
-    
-        vertices = dict(sorted(vertices.items(), key=lambda item: item[1]))
-    
-        #sequences = pd.read_csv(eFile).to_records(index=False)
-        
-        sequences = []
-        with open(seqFile, "r") as file:
-            lines = file.read().splitlines()
-            
-            for line in lines:
-                sequences.append(line.split(','))
                 
     # load Linode (from Index)
     if dataset == 'linode_from_index':
