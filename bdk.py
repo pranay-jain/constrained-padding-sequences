@@ -217,6 +217,4 @@ cap_length = 4 # if cap_sequences is enabled, then this will be the truncated le
 
 if __name__ == "__main__":
     dataset = 'wikipedia'
-    
-
     run_bdk(dataset)

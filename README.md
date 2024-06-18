@@ -2,6 +2,15 @@
 
 This repo contains the datasets for the paper *"Near-Optimal Constrained Padding for Object Retrievals with Dependencies"* -- currently under review at USENIX 2024. The `data/` directory consists of three directories, corresponding to the datasets used in the study. 
 
+## Installation
+
+All of our executable code is written in Python, either in scripts or notebooks. To set up the required packages, we recommend using a python virtual environment, such as `conda`, `virtualenv` or `venv`. Once you have activated your virtual environment of choice, run the command:
+```
+pip install -r requirements.txt
+```
+
+For `python3` environments, replace `pip` with `pip3` if needed. This will install all the packages required by the code in this repository.
+
 ## Running the model
 
 #### Padding For Sequences (PFS)
