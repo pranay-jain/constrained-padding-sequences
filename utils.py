@@ -134,7 +134,7 @@ def chunks(l, n):
         si = (d+1)*(i if i < r else r) + d*(0 if i < r else i - r)
         yield l[si:si+(d+1 if i < r else d)]  
 
-def rec_entropy(s, pad_s, cur_sizes, i, prev_prob, tgt_length):
+def rec_entropy(s, pad_s, cur_sizes, i, prev_prob, y_seq_counts, s_seq_counts, tgt_length):
     cur_v = s[i]
     for size, prob in pad_s[cur_v]:
         cur_prob = prev_prob * prob
@@ -144,11 +144,11 @@ def rec_entropy(s, pad_s, cur_sizes, i, prev_prob, tgt_length):
             final_s = tuple(cur_sizes)
             y_seq_counts[final_s] += cur_prob * s_seq_counts[tuple(s)]
         else:
-            rec_entropy(s, pad_s, cur_sizes, i+1, cur_prob, tgt_length)
+            rec_entropy(s, pad_s, cur_sizes, i+1, cur_prob, y_seq_counts, s_seq_counts, tgt_length)
             
 def main_entropy(s, pad_s, s_seq_counts, y_seq_counts, tgt_length):
     if len(s) >= tgt_length:
-        rec_entropy(s, pad_s, [0]*tgt_length, 0, 1.0, tgt_length)
+        rec_entropy(s, pad_s, [0]*tgt_length, 0, 1.0, y_seq_counts, s_seq_counts, tgt_length)
         
 def rec_condl_entropy(s, pad_s, cur_sizes, i, prev_prob, trunc_sequence_probs):
     cur_v = s[i]

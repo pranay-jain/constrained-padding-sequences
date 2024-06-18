@@ -9,7 +9,7 @@ This repo contains the datasets for the paper *"Near-Optimal Constrained Padding
 This is the proposed algorithm for producing near-optimal padding scheme for sequences. To run this algorithm, execute the `pfs.py` code. Sample execution:
 
 ```
-python pfs.py -d wikipedia -c 1.05
+python main.py -d wikipedia -c 1.05
 ```
 
 #### Parameters
