@@ -36,7 +36,7 @@ def run_pwod(dataset, c):
     
         i_inf_res.append(i_inf)
     
-    return pad_scheme
+    return pad_scheme, i_inf_res
 
 
 if __name__ == "__main__":

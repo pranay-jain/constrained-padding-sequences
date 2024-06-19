@@ -4,7 +4,7 @@ import csv
 from collections import defaultdict
 
 from load_dataset import load_dataset, load_sequence_counts
-from utils import main_entropy
+from utils import main_entropy, main_tgt_length
 
 
 # Construct the sources list used in algorithm
@@ -150,7 +150,7 @@ def constructQWikipedia(edges, destinations):
     return Q
 
 
-def run_bdk(dataset, save_dir=None):
+def run_bdk(dataset, num_trials=100, save_dir=None):
     vertices, vertices_subset, sequences, prefix_closed_sequences, max_length, edges, Q = load_dataset(dataset, cap_sequences, cap_length)
     s_seq_counts = load_sequence_counts(dataset)
 
@@ -160,9 +160,7 @@ def run_bdk(dataset, save_dir=None):
     min_MI_envelope = [math.inf] * max_length
     max_MI_envelope = [-math.inf] * max_length
 
-    NUM_TRIALS = 10
-
-    for trial in range(NUM_TRIALS):
+    for trial in range(num_trials):
         sum_pad_fac, len_pad_fac = 0, 0
 
         sets, B_tracker = bdk_step1(vertices, edges, Q)
@@ -209,8 +207,20 @@ def run_bdk(dataset, save_dir=None):
             spamwriter.writerow([f'backes_max_envelope', max_MI_envelope])
             spamwriter.writerow([f'backes_c_list', max_c_list])
 
-    print(f'Completed {NUM_TRIALS} runs of BDK.')
-    # print(f"Max Mutual Information across the runs: {max_MI_envelope}. Min Mutual Information across the runs: {min_MI_envelope}.")
+    print(f'Completed {num_trials} runs of BDK.')
+    
+    i_inf_res = []
+    for tgt_length in range(1, max_length+1):
+        max_probs = defaultdict(float)
+
+        for seq in sequences:
+            main_tgt_length(seq, pad_scheme, max_probs, tgt_length)
+
+        i_inf = math.log2(sum(max_probs.values()))
+
+        i_inf_res.append(i_inf)
+
+    return min_MI_envelope, max_MI_envelope, max_c_list, mean_pad_factors, i_inf_res
 
 cap_sequences = False
 cap_length = 4 # if cap_sequences is enabled, then this will be the truncated length
