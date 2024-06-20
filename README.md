@@ -1,15 +1,27 @@
 # Near-Optimal Constrained Padding for Object Retrievals with Dependencies
 
-This repo contains the datasets for the paper *"Near-Optimal Constrained Padding for Object Retrievals with Dependencies"* -- currently under review at USENIX 2024. The `data/` directory consists of three directories, corresponding to the datasets used in the study. 
+This repo contains the datasets and code for our paper:
+
+__"Near-Optimal Constrained Padding for Object Retrievals with Dependencies"__  
+[Pranay Jain](https://www.linkedin.com/in/pranayjain1), [Andrew C. Reed](https://andrewreed.io), and [Michael K. Reiter](https://reitermk.github.io)  
+[33rd USENIX Security Symposium](https://www.usenix.org/conference/usenixsecurity24), August 2024
+
+The `data/` directory consists of three directories, corresponding to the datasets used in the study.
 
 ## Installation
 
-All of our executable code is written in Python, either in scripts or notebooks. To set up the required packages, we recommend using a python virtual environment, such as `conda`, `virtualenv` or `venv`. Once you have activated your virtual environment of choice, run the command:
+All of our executable code is written in Python, either in .py scripts or in Jupyter notebooks. To set up the required packages, we recommend using a Python virtual environment, such as `conda`, `virtualenv` or `venv`. Once you have activated your virtual environment of choice, run the command:
 ```
 pip install -r requirements.txt
 ```
 
 For `python3` environments, replace `pip` with `pip3` if needed. This will install all the packages required by the code in this repository.
+
+#### Gurobi
+
+Our code uses the Gurobi Optimizer. If you do not already have access to Gurobi, our recommendation is to obtain an _Academic Named-User License_. Instructions for how to obtain a Gurobi academic license can be found at:
+
+[Gurobi Academic License Program](https://www.gurobi.com/academia/academic-program-and-licenses)
 
 ## Running the model
 
