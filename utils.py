@@ -198,3 +198,25 @@ def compute_h_y_s(sequences, s_seq_counts, tgt_length):
         condl_entropy_calc += prob_seq * interior_entropy_sum
     return condl_entropy_calc
 
+def rec_l_div(dataset, s, pad_s, cur_sizes, i, prev_prob, y_seq_counts, tgt_length, weights):
+    if dataset == "linode_from_index":
+        cur_v = '~'.join(s[:i+1])       # SWITCH - only for linode
+    else:
+        cur_v = s[i]                    # Autocomplete, or wiki
+    for size, prob in pad_s[cur_v]:
+        cur_prob = prev_prob * prob
+        cur_sizes[i] = size
+        
+        if i == tgt_length - 1:
+            final_s = tuple(cur_sizes)
+            #y_seq_counts[final_s].append(cur_prob * s_seq_counts[tuple(s)])
+            y_seq_counts[final_s].append(cur_prob * weights[s[i]])
+        else:
+            rec_l_div(dataset, s, pad_s, cur_sizes, i+1, cur_prob, y_seq_counts, tgt_length, weights)
+            
+def main_l_div(dataset, s, pad_s, s_seq_counts, y_seq_counts, tgt_length, weights):
+    if len(s) >= tgt_length:
+        rec_l_div(dataset, s, pad_s, [0]*tgt_length, 0, 1.0, y_seq_counts, tgt_length, weights)
+
+def elementWiseDiff(a, b):
+    return [j - i if j - i > 1e-10 else 0 for i, j in zip(a, b)]
