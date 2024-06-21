@@ -6,7 +6,7 @@ from scipy.sparse import csr_matrix, lil_matrix
 from collections import defaultdict
 
 from load_dataset import load_dataset, load_sequence_counts
-from utils import create_strides, main_tgt_length, main_2, main_l_div_for_lp
+from utils import create_strides, main_tgt_length, main_2, main_l_div_for_lp, main_entropy, compute_h_y_s
 
 cap_sequences = False
 cap_length = 4 # if cap_sequences is enabled, then this will be the truncated length
@@ -16,7 +16,7 @@ gurobi_output = 0 # 0 = don't show; 1 = show
 
 # --------- Main Functions --------------
 
-def run_pfs(dataset, c, k=2, prefix_closed=True):
+def run_pfs(dataset, c, k=2, prefix_closed=True, run_experiments=True):
     vertices, vertices_subset, sequences, prefix_closed_sequences, max_length, edges, Q = load_dataset(dataset, cap_sequences, cap_length)
     s_seq_counts = load_sequence_counts(dataset)
 
@@ -40,15 +40,19 @@ def run_pfs(dataset, c, k=2, prefix_closed=True):
         
         pad_scheme[v] = pad_list
     
-    i_inf = compute_i_inf(sequences, pad_scheme, max_length)
-
-    min_l_div, max_l_div, avg_l_div = compute_l_diversity_stats(sequences, pad_scheme, max_length, s_seq_counts)
+    if run_experiments:
+        i_inf = compute_i_inf(sequences, pad_scheme, max_length)
+        min_l_div, max_l_div, avg_l_div = compute_l_diversity_stats(sequences, pad_scheme, max_length, s_seq_counts)
+        mutual_inf = compute_mutual_inf(sequences, pad_scheme, max_length, s_seq_counts)
     
-    return {
-        'pad_scheme': pad_scheme, 
-        'i_inf': i_inf,
-        'l_div': (min_l_div, max_l_div, avg_l_div)
-    }
+        return {
+            'pad_scheme': pad_scheme, 
+            'i_inf': i_inf,
+            'l_div': (min_l_div, max_l_div, avg_l_div),
+            'mutual_inf': mutual_inf
+        }
+    else:
+        return pad_scheme
 
 
 def run_pfg(dataset, c, k=2):
@@ -231,4 +235,26 @@ def compute_l_diversity_stats(sequences, pad_scheme, max_length, s_seq_counts):
         max_l_div.append(max(all_l_div))     
     
     return min_l_div, max_l_div, avg_l_div
+
+def compute_mutual_inf(sequences, pad_scheme, max_length, s_seq_counts):
+    mi_res = []    
+    for tgt_length in range(1, max_length+1):
+        y_seq_counts = defaultdict(float)
+
+        for seq in sequences:
+            main_entropy(seq, pad_scheme, s_seq_counts, y_seq_counts, tgt_length)
     
+        entropy_calc = 0.0
+        total_count = sum(y_seq_counts.values())
+
+        for y, seq_count in y_seq_counts.items():     
+            prob = seq_count / total_count
+            if prob > 0:
+                entropy_calc -= prob * math.log2(prob)
+            
+        condl_entropy_calc = compute_h_y_s(pad_scheme, sequences, s_seq_counts, tgt_length, total_count)
+    
+        mi_calc = entropy_calc + condl_entropy_calc
+    
+        mi_res.append(mi_calc)
+    return mi_res

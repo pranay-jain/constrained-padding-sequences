@@ -220,7 +220,12 @@ def run_bdk(dataset, num_trials=100, save_dir=None):
 
         i_inf_res.append(i_inf)
 
-    return pad_scheme, min_MI_envelope, max_MI_envelope, max_c_list, mean_pad_factors, i_inf_res
+    return {
+        'pad_scheme':pad_scheme, 
+        'mutual_inf': (min_MI_envelope, max_MI_envelope), 
+        'pad_factors': (max_c_list, mean_pad_factors),
+        'i_inf': i_inf_res
+    }
 
 cap_sequences = False
 cap_length = 4 # if cap_sequences is enabled, then this will be the truncated length

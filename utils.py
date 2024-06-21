@@ -187,7 +187,7 @@ def main_condl_entropy(s, pad_s, trunc_sequence_probs):
     rec_condl_entropy(s, pad_s, [0]*len(s), 0, 1.0, trunc_sequence_probs)
     
 #### H(Y|S) code 
-def compute_h_y_s(sequences, s_seq_counts, tgt_length):
+def compute_h_y_s(pad_scheme, sequences, s_seq_counts, tgt_length, total_count):
     trunc_s_seq_counts = defaultdict(float)
     trunc_sequences_set = set()
     
