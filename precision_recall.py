@@ -163,6 +163,9 @@ def precision_recall(pad_scheme_flat, test_seqs, seq_in_target_set, p_s, dataset
     for s_y in p_y_s_times_p_s:
         if totals_y[s_y[1]] != 0:
             p_s_y[s_y] = p_y_s_times_p_s[s_y] / totals_y[s_y[1]]
+        else:
+            print('YELLOW')
+            p_s_y[s_y] = 0.5
 
     adversary = {}
 
@@ -457,18 +460,6 @@ def average_recall_precision(results, method, seq_len, dataset):
         if count > 0:
             recall_precision_avg[recall_sum / count] = precision_sum / count
     return recall_precision_avg
-
-# def compute_precision_recall_ldiv(l, partitions, seq_len, dataset):
-#     pad_scheme = pad_scheme_from_partitions(partitions)
-#     pad_scheme_flat = get_flat_pad_scheme(pad_scheme)
-    
-#     if dataset == 'autocomplete':
-#         pad = {key: val for pad_dict in pad_scheme_flat for key, val in pad_dict.items() }
-#         precision_recall_autcomplete(
-#             pad, seq_len=seq_len, method=f'L-Diversity(l={l})')
-#     if dataset == "linode_from_index":
-#         print(pad_scheme_flat)
-#     #dataset = 'wikipedia'
 
 
 def compute_precision_recall_ldiv_pad_scheme(l, pad_scheme, seq_len, dataset, sequences = None):

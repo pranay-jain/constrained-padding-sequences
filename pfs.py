@@ -6,13 +6,15 @@ from scipy.sparse import csr_matrix, lil_matrix
 from collections import defaultdict
 
 from load_dataset import load_dataset, load_sequence_counts
-from utils import create_strides, main_tgt_length, main_2
+from utils import create_strides, main_tgt_length, main_2, main_l_div_for_lp
 
 cap_sequences = False
 cap_length = 4 # if cap_sequences is enabled, then this will be the truncated length
 
 thread_count = 16
 gurobi_output = 0 # 0 = don't show; 1 = show
+
+# --------- Main Functions --------------
 
 def run_pfs(dataset, c, k=2, prefix_closed=True):
     vertices, vertices_subset, sequences, prefix_closed_sequences, max_length, edges, Q = load_dataset(dataset, cap_sequences, cap_length)
@@ -38,20 +40,15 @@ def run_pfs(dataset, c, k=2, prefix_closed=True):
         
         pad_scheme[v] = pad_list
     
-    i_inf_res = []    
-    for tgt_length in range(1, max_length + 1):
-        max_probs = defaultdict(float)
+    i_inf = compute_i_inf(sequences, pad_scheme, max_length)
+
+    min_l_div, max_l_div, avg_l_div = compute_l_diversity_stats(sequences, pad_scheme, max_length, s_seq_counts)
     
-        for seq in sequences:
-            main_tgt_length(seq, pad_scheme, max_probs, tgt_length)
-    
-        i_inf = math.log2(sum(max_probs.values()))
-        
-        print(f"i_inf for target sequence length {tgt_length} = {i_inf}")
-    
-        i_inf_res.append(i_inf)
-    
-    return pad_scheme, i_inf_res
+    return {
+        'pad_scheme': pad_scheme, 
+        'i_inf': i_inf,
+        'l_div': (min_l_div, max_l_div, avg_l_div)
+    }
 
 
 def run_pfg(dataset, c, k=2):
@@ -85,21 +82,15 @@ def run_pfg(dataset, c, k=2):
         
         pad_scheme[v] = pad_list
     
-    i_inf_res = []    
-    for tgt_length in range(1, max_length + 1):
-        max_probs = defaultdict(float)
+    i_inf = compute_i_inf(sequences, pad_scheme, max_length)
     
-        for seq in sequences:
-            main_tgt_length(seq, pad_scheme, max_probs, tgt_length)
-    
-        i_inf = math.log2(sum(max_probs.values()))
-        
-        print(f"i_inf for target sequence length {tgt_length} = {i_inf}")
-    
-        i_inf_res.append(i_inf)
-    
-    return pad_scheme, i_inf_res
+    return {
+        'pad_scheme': pad_scheme, 
+        'i_inf': i_inf,
+    }
 
+
+# --------- Helper Functions --------------
 
 def linear_program(c, v_dict, e_list, u_sizes, stride_u_sizes, max_length):    
    
@@ -189,3 +180,55 @@ def linear_program(c, v_dict, e_list, u_sizes, stride_u_sizes, max_length):
     print("Gurobi's optimization method runtime (in seconds): " + str(end_time - start_time))
     
     return m, poss_sizes
+
+def compute_i_inf(sequences, pad_scheme, max_length):
+    i_inf_res = []    
+    for tgt_length in range(1, max_length + 1):
+        max_probs = defaultdict(float)
+    
+        for seq in sequences:
+            main_tgt_length(seq, pad_scheme, max_probs, tgt_length)
+    
+        i_inf = math.log2(sum(max_probs.values()))
+        
+        print(f"i_inf for target sequence length {tgt_length} = {i_inf}")
+    
+        i_inf_res.append(i_inf)
+    
+    return i_inf_res
+
+def compute_l_diversity_stats(sequences, pad_scheme, max_length, s_seq_counts):
+    min_l_div = []
+    avg_l_div = []
+    max_l_div = []
+    
+    for tgt_length in range(1, max_length+1):
+        y_seq_counts = defaultdict(list)
+    
+        for seq in sequences:
+            main_l_div_for_lp(seq, pad_scheme, s_seq_counts, y_seq_counts, tgt_length)
+    
+        all_l_div = []
+        for y_seq, y_seq_list_of_counts in y_seq_counts.items():
+            v_counts = defaultdict(float)
+            denom = 0
+            
+            for v, count in y_seq_list_of_counts:
+                v_counts[v] += count
+                denom += count
+                
+            local_l_div = math.inf
+            
+            for v, count in v_counts.items():
+                if count > 0.0:
+                    inverse_prob = denom / count
+                    local_l_div = min(local_l_div, inverse_prob)
+                
+            all_l_div.append(local_l_div)
+            
+        min_l_div.append(min(all_l_div))
+        avg_l_div.append(np.mean(np.array(all_l_div)))
+        max_l_div.append(max(all_l_div))     
+    
+    return min_l_div, max_l_div, avg_l_div
+    

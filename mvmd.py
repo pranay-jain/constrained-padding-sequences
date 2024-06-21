@@ -4,11 +4,10 @@ import pandas as pd
 import random
 import statistics
 import math
-from scipy.sparse import csr_matrix, lil_matrix
 from collections import defaultdict
 
 from load_dataset import load_dataset, load_sequence_counts
-from utils import main_l_div
+from utils import main_l_div, main_tgt_length_mvmd
 
 
 # Assumes all sequences are equal length
@@ -364,12 +363,28 @@ def run_mvmd(dataset, l=3, cap_sequences = False, cap_length = 3):
                 local_l_div = min(local_l_div, inverse_prob)
     
             all_l_div.append(local_l_div)
-            
+
         min_l_div.append(min(all_l_div))
         avg_l_div.append(statistics.mean(all_l_div))
         max_l_div.append(max(all_l_div))
     
-    return min_l_div, avg_l_div, max_l_div, partitions, pad_scheme
+    i_inf_res = []
+    for tgt_length in range(1, max_length + 1):
+        max_probs = defaultdict(float)
+
+        for seq in sequences:
+            main_tgt_length_mvmd(seq, pad_scheme, max_probs, tgt_length, dataset)
+
+        i_inf = math.log2(sum(max_probs.values()))
+
+        i_inf_res.append(i_inf)
+    
+    return {
+        'l_div': (min_l_div, max_l_div, avg_l_div), 
+        'partitions': partitions, 
+        'pad_scheme': pad_scheme, 
+        'i_inf': i_inf_res
+    }
 
 
 if __name__ == "__main__":
