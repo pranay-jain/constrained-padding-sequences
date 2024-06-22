@@ -195,8 +195,6 @@ def compute_i_inf(sequences, pad_scheme, max_length):
     
         i_inf = math.log2(sum(max_probs.values()))
         
-        print(f"i_inf for target sequence length {tgt_length} = {i_inf}")
-    
         i_inf_res.append(i_inf)
     
     return i_inf_res

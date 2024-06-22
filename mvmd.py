@@ -1,4 +1,3 @@
-import gurobipy as gp
 import numpy as np
 import pandas as pd
 import random
@@ -382,8 +381,9 @@ def run_mvmd(dataset, l=3, cap_sequences = False, cap_length = 3):
     return {
         'l_div': (min_l_div, max_l_div, avg_l_div), 
         'partitions': partitions, 
-        'pad_scheme': pad_scheme, 
-        'i_inf': i_inf_res
+        'pad_scheme': pad_scheme,
+        'i_inf': i_inf_res,
+        'pad_factors': pad_factors[l]
     }
 
 

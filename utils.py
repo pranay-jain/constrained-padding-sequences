@@ -262,3 +262,12 @@ def main_l_div_for_lp(s, pad_s, s_seq_counts, y_seq_counts, tgt_length):
 
 def elementWiseDiff(a, b):
     return [j - i if j - i > 1e-10 else 0 for i, j in zip(a, b)]
+
+def compute_c_vals(pad_scheme_flat, vertices):
+    c_vals = [padded_size / vertices[v] for v, padded_size in pad_scheme_flat.items()]
+    overhead_vals = [padded_size - vertices[v] for v, padded_size in pad_scheme_flat.items()]
+    mean_overhead = sum(overhead_vals) / len(overhead_vals)
+    max_c = max(c_vals)
+    mean_c = sum(c_vals) / len(c_vals)
+    
+    return max_c, mean_c

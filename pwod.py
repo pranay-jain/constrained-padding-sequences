@@ -31,9 +31,7 @@ def run_pwod(dataset, c):
         for seq in sequences:
             main_tgt_length(seq, pad_scheme, max_probs, tgt_length)
     
-        i_inf = math.log2(sum(max_probs.values()))
-        print(f"i_inf for target sequence length {tgt_length} = {i_inf}")
-    
+        i_inf = math.log2(sum(max_probs.values()))    
         i_inf_res.append(i_inf)
     
     return pad_scheme, i_inf_res

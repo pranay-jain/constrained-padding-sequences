@@ -277,9 +277,6 @@ def load_sequence_counts_autocomplete():
             seq.append(row['Query'][:i])
             
         seq = tuple(seq)
-        
-        if seq in s_seq_counts:
-            print(seq)
         s_seq_counts[seq] = row['NumSearchResults']
         
     return s_seq_counts
