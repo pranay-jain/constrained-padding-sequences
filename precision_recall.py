@@ -158,14 +158,7 @@ def precision_recall(pad_scheme_flat, test_seqs, seq_in_target_set, p_s, dataset
         else:
             target_set_neg[y_seq] = target_set_neg.get(y_seq, 0) + (1 * p_y_s_times_p_s[y_s])
 
-    # p_s_y = { s_y: p_y_s_times_p_s[s_y] / totals_y[s_y[1]] for s_y in p_y_s_times_p_s }
-    p_s_y = {}
-    for s_y in p_y_s_times_p_s:
-        if totals_y[s_y[1]] != 0:
-            p_s_y[s_y] = p_y_s_times_p_s[s_y] / totals_y[s_y[1]]
-        else:
-            print('YELLOW')
-            p_s_y[s_y] = 0.5
+    p_s_y = { s_y: p_y_s_times_p_s[s_y] / totals_y[s_y[1]] for s_y in p_y_s_times_p_s }
 
     adversary = {}
 
@@ -259,7 +252,7 @@ def precision_recall_autcomplete(pad_scheme_flat: dict, seq_len: int = 7, method
     results = []
     for _ in range(EXPT_COUNT):
         test_words, word_in_target_set, search_results = load_test_words(seq_len)
-        print(f"number of words: {len(test_words)}")
+        # print(f"number of words: {len(test_words)}")
         if 'lp' in method.lower():
             recall_precision_mp = precision_recall_per_req(
                 pad_scheme_flat, test_words, word_in_target_set, search_results, dataset="autocomplete", seq_len=seq_len)
@@ -269,10 +262,6 @@ def precision_recall_autcomplete(pad_scheme_flat: dict, seq_len: int = 7, method
         results.append(recall_precision_mp)
     
     return average_recall_precision(results, method, seq_len, "autocomplete")
-    # return recall_precision_mp
-    # with open(f'../experiments/results/recall_precision_seq{seq_len}.csv', 'a') as f:
-    #     spamwriter = csv.writer(f)
-    #     spamwriter.writerow([method, json.dumps(recall_precision_mp)])
 
 
 def precision_recall_wiki(pad_scheme_flat: dict, seq_len: int = 7, method: str = "LP"):

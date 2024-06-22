@@ -68,8 +68,8 @@ def load_dataset(dataset, cap_sequences, cap_length):
     if dataset == 'wikipedia':
         vFile = 'data/wikipedia_dataset/vertices.csv'
         eFile = 'data/wikipedia_dataset/edges_sm.csv'
-        # seqFile = '../wikipedia_dataset/sequences_new.csv'
-        seqFile = 'data/wikipedia_dataset/sequences_random_walk.csv'
+        seqFile = 'data/wikipedia_dataset/sequences_new.csv'
+        # seqFile = 'data/wikipedia_dataset/sequences_random_walk.csv'
         
         edges = pd.read_csv(eFile, header=None).to_records(index=False)
 
@@ -97,7 +97,7 @@ def load_dataset(dataset, cap_sequences, cap_length):
                 counter[seq[0]] += 1
                 if len(seq) == 7 and counter[seq[0]] <= 2:
                     sequences.append(seq)
-                    
+
         sources, destinations = constructSourcesDestinations(vertices, edges)
         Q = constructQWikipedia(edges, destinations)    
         
