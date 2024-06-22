@@ -36,31 +36,9 @@ We provide Jupyter notebooks that run each of our primary experiments from the p
 
 Descriptions of our datasets can be found in Section 5.1 of our paper.
 
-The function `load_dataset` located in `load_dataset.py` loads each of our datasets. For the purposes of running our experiments, everything is automated within the Jupyter notebooks (described above). Information about the function's input arguments and its output can be found in `load_dataset.py`.
+The function `load_dataset` located in `load_dataset.py` loads each of our datasets. For the purposes of running our experiments, everything is automated within the Jupyter notebooks (described above).
 
-#### Pranay
-I think this needs to go as documentation in load_dataset.py:
-
-The input arguments for `load_dataset` are as follows:
-1. `dataset`: a string that should be one of {`autocomplete`, `linode_from_index`, `wikipedia`}
-2. `cap_sequences`: a Boolean that indicates if the sequences should be truncated when loaded
-3. `cap_length`: an integer; if `cap_sequences` is set to `True` then sequences are truncated to this length
-
-For our experiments, we left `cap_sequences` to `False`, i.e., we did not leverage that feature of `load_dataset`.
-
-`load_dataset` returns the following output:
-1. `vertices` - a dictionary where the key is the object's name and the value is its size (in bytes)
-2. `vertices_subset` - this is an unused variable -- it includes only the vertices that were included in the sampled sequences. For most cases, this set is almost equal to the vertices set.
-3. `sequences` - the list of sequences of linked objects from the dataset
-4. `prefix_closed_sequences` - the prefix-closed set of sequences produced from sequences
-5. `max_length` - the maximum length of a sequence across the set of sequences
-6. `edges` - a set of tuples, where each tuple represents the source and destination node of an edge
-7. `Q` - a transition matrix based on the Markov assumption, as used by the BDK algorithm
-
-#### I THINK WE DELETE THE REST OF THIS
-
-
-#### Running Padding For Sequences (PFS)
+## Running Padding For Sequences (PFS)
 
 This is the proposed algorithm for producing near-optimal padding scheme for sequences. The `experiments` directory shows how the model (and baselines) can be executed in notebooks. This section describes how to execute the PFS algorithm as a python executable. To run this algorithm, execute the `main.py` code. Sample execution:
 
@@ -77,5 +55,3 @@ python main.py -d wikipedia -c 1.05
 3. [Optional] Stride count `k` (use flag `-k` or `--stride`):
 
 4. [Optional] Prefix closed (use flag `--prefix-closed`): This is a boolean argument which selects if the prefix-closed set of sequences is used as input to the model. The definition for prefix closure is provided in the paper.
-
-
