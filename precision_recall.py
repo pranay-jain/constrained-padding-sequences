@@ -162,16 +162,16 @@ def precision_recall(pad_scheme_flat, test_seqs, seq_in_target_set, p_s, dataset
 
     adversary = {}
 
-    print(f"Len observed: {len(observed_sequences)}")
+    # print(f"Len observed: {len(observed_sequences)}")
     for seq in observed_sequences:
         for target_word in target_words:
             if (target_word, seq) in p_s_y:
                 if seq not in adversary:
                     adversary[seq] = 0
                 adversary[seq] += p_s_y[(target_word, seq)]
-    print(f"Len adversary: {len(adversary)} {len(p_s_y)}")
-    print(sum(p_s_y.values()) / len(p_s_y.values()))
-    print(list(p_s_y.keys())[0])
+    # print(f"Len adversary: {len(adversary)} {len(p_s_y)}")
+    # print(sum(p_s_y.values()) / len(p_s_y.values()))
+    # print(list(p_s_y.keys())[0])
 
     recall_precision_mp = {}
     for tau in TAU_RANGE:
@@ -265,11 +265,10 @@ def precision_recall_autcomplete(pad_scheme_flat: dict, seq_len: int = 7, method
 
 
 def precision_recall_wiki(pad_scheme_flat: dict, seq_len: int = 7, method: str = "LP"):
-    _, _, sequences, _ = load_wiki_dataset(past=False)
+    sequences, _ = load_wiki_dataset(past=False)
     test_seqs = list(set([tuple(seq[:seq_len]) for seq in sequences]))
 
-    p_s = load_sequence_counts_wiki()
-    # p_s = load_sequence_counts_wiki(test_sequences=test_seqs)
+    p_s = load_sequence_counts_wiki(test_sequences=test_seqs)
 
     results = []
     for _ in range(EXPT_COUNT):

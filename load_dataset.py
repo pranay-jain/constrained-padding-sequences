@@ -228,7 +228,7 @@ def load_dataset(dataset, cap_sequences, cap_length):
     for seq in sequences:
         for v in seq:
             vertices_subset[v] = vertices[v]  
-                
+
     # max_length is needed inside the LP
     max_length = 0
     for seq in sequences:
@@ -244,7 +244,7 @@ def load_dataset(dataset, cap_sequences, cap_length):
     prefix_closed_sequences = []
     for seq in prefix_closed_set:
         prefix_closed_sequences.append(list(seq))
-            
+
     return vertices, vertices_subset, sequences, prefix_closed_sequences, max_length, edges, Q
 
 def load_sequence_counts(dataset):
@@ -283,14 +283,15 @@ def load_sequence_counts_autocomplete():
 
 
 def load_wiki_dataset(past: bool, cap_sequences: bool = False):
-    df_wiki_nodes = pd.read_csv(f"data/wikipedia_dataset/{'past_' if past else ''}vertices.csv")
-    df_wiki_nodes.columns=['page', 'size']
+    # df_wiki_nodes = pd.read_csv(f"data/wikipedia_dataset/{'past_' if past else ''}vertices.csv")
+    # df_wiki_nodes.columns=['page', 'size']
 
-    df_edges = pd.read_csv(f"data/wikipedia_dataset/{'past_' if past else ''}edges.csv", header=None)
-    df_edges.columns = ['src', 'dst']
+    # df_edges = pd.read_csv(f"data/wikipedia_dataset/{'past_' if past else ''}edges_sm.csv", header=None)
+    # df_edges.columns = ['src', 'dst']
 
-    vertices = dict(zip(df_wiki_nodes['page'], df_wiki_nodes['size']))
-    edges = set(list(zip(df_edges['src'], df_edges['dst'])))
+    # vertices = dict(zip(df_wiki_nodes['page'], df_wiki_nodes['size']))
+    # edges = set(list(zip(df_edges['src'], df_edges['dst'])))
+    # print(f"edges: {len(list(edges))}")
    
     df_wiki_weights = pd.read_csv("data/wikipedia_dataset/weights.csv")
     df_wiki_weights.columns = ['v', 'w']
@@ -298,7 +299,7 @@ def load_wiki_dataset(past: bool, cap_sequences: bool = False):
     wiki_weights = dict(zip(df_wiki_weights['v'], df_wiki_weights['w']))
 
     sequences = []
-    # with open('../wikipedia_dataset/sequences_new.csv', "r") as file:
+    # with open('data/wikipedia_dataset/sequences_new.csv', "r") as file:
     with open('data/wikipedia_dataset/sequences_random_walk.csv', "r") as file:
         lines = file.read().splitlines()
         
@@ -307,11 +308,14 @@ def load_wiki_dataset(past: bool, cap_sequences: bool = False):
             if len(seq) == 7:          ## !!! leaving this here for now ... we can reconsider this though !!!
                 sequences.append(seq)
 
-    return (vertices, list(edges), sequences, wiki_weights)
+    return sequences, wiki_weights
+    # return (vertices, list(edges), sequences, wiki_weights)
 
 
-def load_sequence_counts_wiki():
-    vertices, edges, sequences, page_views = load_wiki_dataset(past=False)
+def load_sequence_counts_wiki(test_sequences=None):
+    sequences, page_views = load_wiki_dataset(past=False)
+    if test_sequences is None:
+        test_sequences = sequences
     
     for page, views in page_views.items():
         if views == -1:
@@ -319,13 +323,22 @@ def load_sequence_counts_wiki():
 
     s_seq_counts = {}  
 
-    for seq in sequences:     
+    for seq in test_sequences:     
         sum_of_page_views = 0
         for page in seq:
             sum_of_page_views += page_views[page]
         s_seq_counts[tuple(seq)] = sum_of_page_views / len(seq) # using the average
 
-    return s_seq_counts
+    # return s_seq_counts
+    
+    # switch: equal seq weights
+    s_seq_counts = {tuple(seq): 1 for seq in test_sequences}
+
+    total_p_s = sum(list(s_seq_counts.values()))
+
+    P_S = { k: v / total_p_s for k, v in s_seq_counts.items() }
+
+    return P_S
 
 
 def load_sequence_counts_linode_from_index():

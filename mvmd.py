@@ -262,7 +262,8 @@ def run_mvmd_autocomplete(dataset, l):
     return va_seq, weights, partitions
 
 
-def run_mvmd_wiki(dataset, vertices, sequences, l):
+def run_mvmd_wiki(dataset, vertices, sequences, l, seed=1):
+    random.seed(seed)
     df_wiki_weights = pd.read_csv("data/wikipedia_dataset/weights.csv")
     df_wiki_weights.columns = ['v', 'w']
 
