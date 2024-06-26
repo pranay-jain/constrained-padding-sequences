@@ -309,6 +309,7 @@ def run_mvmd(dataset, l=3, cap_sequences = False, cap_length = 3):
     else:
         print("Error! Dataset not valid for this algorithm.")
     
+    print(partitions)
     max_c = 0
     pad_factors = {}
     
@@ -369,15 +370,15 @@ def run_mvmd(dataset, l=3, cap_sequences = False, cap_length = 3):
         max_l_div.append(max(all_l_div))
     
     i_inf_res = []
-    for tgt_length in range(1, max_length + 1):
-        max_probs = defaultdict(float)
+    # for tgt_length in range(1, max_length + 1):
+    #     max_probs = defaultdict(float)
 
-        for seq in sequences:
-            main_tgt_length_mvmd(seq, pad_scheme, max_probs, tgt_length, dataset)
+    #     for seq in sequences:
+    #         main_tgt_length_mvmd(seq, pad_scheme, max_probs, tgt_length, dataset)
 
-        i_inf = math.log2(sum(max_probs.values()))
+    #     i_inf = math.log2(sum(max_probs.values()))
 
-        i_inf_res.append(i_inf)
+    #     i_inf_res.append(i_inf)
     
     return {
         'l_div': (min_l_div, max_l_div, avg_l_div), 

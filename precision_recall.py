@@ -2,13 +2,13 @@ import csv
 import pandas as pd
 import json
 from random import sample
-from load_dataset import load_sequence_counts_wiki, load_wiki_dataset, load_sequence_counts_linode_from_index
+from load_dataset import load_dataset, load_sequence_counts_wiki, load_wiki_dataset, load_sequence_counts_linode_from_index
 from collections import Counter
 
 
 # ----- CONSTANTS --------
 TAU_RANGE = [0, 0.1, 0.2, 0.3, 0.5, 0.75, 0.8, 0.9, 1]
-EXPT_COUNT = 10
+EXPT_COUNT = 100
 
 
 # ---------- Helper Functions ----------
@@ -138,10 +138,10 @@ def precision_recall(pad_scheme_flat, test_seqs, seq_in_target_set, p_s, dataset
         if dataset == 'autocomplete':
             y_seq = tuple(get_padding_sequence(test_seq, pad_scheme_flat))
         else:
-            if "L-Diversity" in method:
-                y_seq = pad_scheme_flat['~'.join(list(test_seq))] # --> use this for l-diversity
-            else:
-                y_seq = tuple([pad_scheme_flat[v] for v in test_seq]) # --> use this for other algorithms
+            # if "L-Diversity" in method:
+            #     y_seq = pad_scheme_flat['~'.join(list(test_seq))] # --> use this for l-diversity
+            # else:
+            y_seq = tuple([pad_scheme_flat[v] for v in test_seq]) # --> use this for other algorithms
         
         y_s = (test_seq, y_seq)
 
@@ -282,7 +282,7 @@ def precision_recall_wiki(pad_scheme_flat: dict, seq_len: int = 7, method: str =
             if res == 1:
                 target_p_s += p_s[s]
         
-        print(target_p_s)
+        # print(target_p_s)
 
         if 'lp' in method.lower():
             recall_precision_mp = precision_recall_per_req(pad_scheme_flat, test_seqs, seq_in_target_set, p_s, 'wiki', seq_len=seq_len)
@@ -292,10 +292,6 @@ def precision_recall_wiki(pad_scheme_flat: dict, seq_len: int = 7, method: str =
         results.append(recall_precision_mp)
     
     return average_recall_precision(results, method, seq_len, 'wiki')
-
-    # with open(f'../experiments/results/recall_precision_seq{seq_len}_wiki.csv', 'a') as f:
-    #     spamwriter = csv.writer(f)
-    #     spamwriter.writerow([method, json.dumps(recall_precision_mp)])
 
 
 def precision_recall_linode_from_index(pad_scheme_flat: dict, seq_len: int = 4, method: str = "LP"):
@@ -324,116 +320,6 @@ def precision_recall_linode_from_index(pad_scheme_flat: dict, seq_len: int = 4, 
 # ----     LINODE DATASET 
 # ---------------------------------------
 
-
-def load_dataset(dataset, cap_sequences, cap_length):
-    # load Linode (from Index)
-    if dataset == 'linode_from_index':
-        vFile = 'data/linode/vertices_no_errors.csv'
-        oFile = 'data/linode/object_lists_short.txt'
-        eFile = 'data/linode/edges_no_errors.csv'
-        seqFile = 'data/linode/linode_sequences_from_index.csv'
-        
-        edges = pd.read_csv(eFile).to_records(index=False)
-
-        vertexList = (pd.read_csv(vFile))['URL'].tolist()
-        with open(oFile) as f:
-            objectLists = json.load(f)
-    
-        vertices = {}
-
-        for url in vertexList:
-            objList = objectLists[url]
-            total = 0
-            for obj in objList:
-                total += int(obj[2])
-        
-            vertices[url] = total
-    
-        vertices = dict(sorted(vertices.items(), key=lambda item: item[1]))
-    
-        #sequences = pd.read_csv(eFile).to_records(index=False)
-        
-        sequences = []
-        with open(seqFile, "r") as file:
-            lines = file.read().splitlines()
-            
-            for line in lines:
-                sequences.append(line.split(','))
-                
-        # sources, destinations = constructSourcesDestinations(vertices, edges)
-        # Q = constructQLinode(edges, destinations)
-    
-    # load Wikipedia
-    if dataset == 'wikipedia':
-        vFile = 'data/wikipedia_dataset/vertices.csv'
-        eFile = 'data/wikipedia_dataset/edges.csv'
-        # seqFile = '../wikipedia_dataset/sequences_new.csv'
-        seqFile = 'data/wikipedia_dataset/sequences_random_walks.csv'
-        
-        edges = pd.read_csv(eFile, header=None).to_records(index=False)
-
-        vertices = {}
-        with open(vFile) as csvfile:
-            content = csv.reader(csvfile)
-            for row in content:
-                if row[0] == '':
-                    continue
-                vertices[row[0]] = int(row[1])
-        
-        vertices = dict(sorted(vertices.items(), key=lambda item: item[1]))
-
-        #sequences = pd.read_csv(eFile,header=None).to_records(index=False)
-        
-        sequences = []
-        with open(seqFile, "r") as file:
-            lines = file.read().splitlines()
-            
-            for line in lines:
-                seq = line.split(',')
-                if len(seq) == 7:
-                    sequences.append(seq)
-                    
-        # sources, destinations = constructSourcesDestinations(vertices, edges)
-        # Q = constructQWikipedia(edges, destinations)    
-        
-    # this block truncates sequences if enabled    
-    if cap_sequences:
-        trunc_sequences = []
-    
-        for seq in sequences:
-            trunc_sequences.append(seq[:cap_length])
-            
-        sequences = trunc_sequences
-        
-    # this tracks which vertices are actually included in the sequences
-    # (not using it now, but we may need it)
-    vertices_subset = {}
-        
-    for seq in sequences:
-        for v in seq:
-            vertices_subset[v] = vertices[v]  
-                
-    # max_length is needed inside the LP
-    max_length = 0
-    for seq in sequences:
-        max_length = max(max_length, len(seq))
-        
-    # create the prefix-closed set of sequences    
-    prefix_closed_set = set()
-    
-    for seq in sequences:
-        for i in range(1,len(seq)+1):
-            prefix_closed_set.add(tuple(seq[:i]))
-            
-    prefix_closed_sequences = []
-    for seq in prefix_closed_set:
-        prefix_closed_sequences.append(list(seq))
-            
-    return vertices, vertices_subset, sequences, prefix_closed_sequences, max_length, edges
-
-    
-    
-
 def average_recall_precision(results, method, seq_len, dataset):
     recall_precision_avg = {}
     for tau in TAU_RANGE:
@@ -452,7 +338,6 @@ def average_recall_precision(results, method, seq_len, dataset):
 
 def compute_precision_recall_ldiv_pad_scheme(l, pad_scheme, seq_len, dataset, sequences = None):
     pad = { key: val[0][0] for key, val in pad_scheme.items()}
-    print(pad)
     if dataset == 'autocomplete':
         return precision_recall_autcomplete(
             pad, seq_len=seq_len, method=f'L-Diversity(l={l})')
