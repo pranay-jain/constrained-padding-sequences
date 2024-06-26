@@ -341,17 +341,19 @@ def load_sequence_counts_wiki(test_sequences=None):
     return P_S
 
 
-def load_sequence_counts_linode_from_index():
+def load_sequence_counts_linode_from_index(test_sequences=None):
     seqFile = 'data/linode/linode_sequences_from_index.csv'
         
-    sequences = []
-    with open(seqFile, "r") as file:
-        lines = file.read().splitlines()
+    if test_sequences is None:
+        sequences = []
+        with open(seqFile, "r") as file:
+            lines = file.read().splitlines()
+                
+            for line in lines:
+                sequences.append(line.split(','))
+        test_sequences = sequences
             
-        for line in lines:
-            sequences.append(line.split(','))
-            
-    s_seq_counts = {tuple(seq): 1 for seq in sequences}
+    s_seq_counts = {tuple(seq): 1 for seq in test_sequences}
     
     return s_seq_counts
 

@@ -138,10 +138,10 @@ def precision_recall(pad_scheme_flat, test_seqs, seq_in_target_set, p_s, dataset
         if dataset == 'autocomplete':
             y_seq = tuple(get_padding_sequence(test_seq, pad_scheme_flat))
         else:
-            # if "L-Diversity" in method:
-            #     y_seq = pad_scheme_flat['~'.join(list(test_seq))] # --> use this for l-diversity
-            # else:
-            y_seq = tuple([pad_scheme_flat[v] for v in test_seq]) # --> use this for other algorithms
+            if "L-Diversity" in method and dataset == "linode_from_index":
+                y_seq = pad_scheme_flat['~'.join(list(test_seq))] # --> use this for l-diversity + linode
+            else:
+                y_seq = tuple([pad_scheme_flat[v] for v in test_seq]) # --> use this for other algorithms
         
         y_s = (test_seq, y_seq)
 
@@ -295,13 +295,12 @@ def precision_recall_wiki(pad_scheme_flat: dict, seq_len: int = 7, method: str =
 
 
 def precision_recall_linode_from_index(pad_scheme_flat: dict, seq_len: int = 4, method: str = "LP"):
-    vertices, vertices_subset, dataset_sequences, prefix_closed_sequences, max_length, edges = load_dataset(
-        'linode_from_index', cap_sequences=True, cap_length=seq_len)
+    _, _, dataset_sequences, _, _, _, _ = load_dataset('linode_from_index', cap_sequences=True, cap_length=seq_len)
     
     test_seqs = list(set([tuple(seq[:seq_len]) for seq in dataset_sequences]))
 
-    p_s = load_sequence_counts_linode_from_index()
-    # p_s = load_sequence_counts_linode_from_index(test_sequences=test_seqs)
+    # p_s = load_sequence_counts_linode_from_index()
+    p_s = load_sequence_counts_linode_from_index(test_sequences=test_seqs)
 
     results = []
     for _ in range(EXPT_COUNT):
