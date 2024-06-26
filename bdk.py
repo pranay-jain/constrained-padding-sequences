@@ -150,7 +150,8 @@ def constructQWikipedia(edges, destinations):
     return Q
 
 
-def run_bdk(dataset, num_trials=100, save_dir=None):
+def run_bdk(dataset, num_trials=100, save_dir=None, seed=1):
+    np.random.seed(seed)
     vertices, vertices_subset, sequences, prefix_closed_sequences, max_length, edges, Q = load_dataset(dataset, cap_sequences, cap_length)
     s_seq_counts = load_sequence_counts(dataset)
 
