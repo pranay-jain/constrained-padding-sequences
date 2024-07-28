@@ -21,12 +21,15 @@ Our code uses the Gurobi Optimizer. If you do not already have access to Gurobi,
 
 [Gurobi Academic License Program](https://www.gurobi.com/academia/academic-program-and-licenses)
 
-**Note on Gurobi License Installation:**  
+**Note on Gurobi License Installation:**
+
 The final step of setting up the Gurobi license requires you to run the command `grbgetkey` with the serial number provided to you by Gurobi. This command **must** be executed while your computer is connected to your academic network.
 
 If your computer is not connected to your academic network, then using a VPN connected to the academic network will work. However, sometimes VPNs are only configured for split-tunneling, i.e., only traffic destined for the academic network itself will be routed through the VPN. In those instances, if you have SSH access to a server located on the academic network, then here is a potential workaround:
 1. Connect to your academic network using your VPN.
-2. Use a program such as `sshuttle` to route **all** internet traffic through SSH. This can be done using the following command: `~/anaconda3/bin/sshuttle -r username@servername 0/0 -x servername`. In the preceding command, adjust the path to `sshuttle` according to your own development environment, and replace `username` and `servername` with your own credentials for the SSH server that you will be using.
+2. In a terminal window, use a program such as `sshuttle` to route **all** internet traffic through SSH. This can be done using the following command: `~/anaconda3/bin/sshuttle -r username@servername 0/0 -x servername`. In the preceding command, adjust the path to `sshuttle` according to your own development environment, and replace `username` and `servername` with your own credentials for the SSH server that you will be using.
+3. In a second terminal window, run the command `grbgetkey` with the serial number provided to you by Gurobi.
+4. Once the Gurobi license has been activated, you can close the `sshuttle` connection using `CTRL-C` in the first terminal window, and then disconnect from the VPN.
 
 ## Organization
 
