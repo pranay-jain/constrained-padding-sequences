@@ -6,6 +6,9 @@ __"Near-Optimal Constrained Padding for Object Retrievals with Dependencies"__
 [Pranay Jain](https://www.linkedin.com/in/pranayjain1), [Andrew C. Reed](https://andrewreed.io), and [Michael K. Reiter](https://reitermk.github.io)  
 [33rd USENIX Security Symposium](https://www.usenix.org/conference/usenixsecurity24), August 2024
 
+[![DOI](https://zenodo.org/badge/706495481.svg)](https://zenodo.org/doi/10.5281/zenodo.13119686)
+
+
 ## Installation
 
 All of our executable code is written in Python, either in .py scripts or in Jupyter notebooks. To set up the required packages, we recommend using a Python virtual environment, such as `conda`, `virtualenv` or `venv`. Once you have activated your virtual environment of choice, run the command:
