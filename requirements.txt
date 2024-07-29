@@ -1,7 +1,7 @@
 google==3.0.0
 gurobipy==11.0.2
 ipykernel==6.29.4
-ipython==8.25.0
+ipython~=8.25
 jupyter==1.0.0
 matplotlib==3.9.0
 memory-profiler==0.61.0
